@@ -1,5 +1,6 @@
 package com.example.groomingsalonapp.Domain;
 
+import com.example.groomingsalonapp.Converter.DurationToMinutesConvertor;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -28,7 +29,7 @@ public class Handling {
     private HandlingName handlingName;
 
     @Column(name = "duration")
-    // @JsonFormat(pattern = "HH:mm")
+    @Convert(converter = DurationToMinutesConvertor.class)
     private Duration duration;
 
 

@@ -2,6 +2,7 @@ package com.example.groomingsalonapp.Controller;
 
 import com.example.groomingsalonapp.DTO.AppointmentDto;
 import com.example.groomingsalonapp.Domain.Appointment;
+import com.example.groomingsalonapp.Domain.HandlingName;
 import com.example.groomingsalonapp.Service.AppointmentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -24,8 +25,9 @@ public class AppointmentController {
 
     @PatchMapping("/updateDate/{appointmentId}")
     public AppointmentDto updateAppointment (@PathVariable Long appointmentId,
-                                             @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm") LocalDateTime date
+                                             @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm") LocalDateTime date,
+                                             @PathVariable HandlingName handlingName
     ){
-        return appointmentService.updateAppointment(appointmentId, date);
+        return appointmentService.updateAppointment(appointmentId, date, handlingName);
     }
 }

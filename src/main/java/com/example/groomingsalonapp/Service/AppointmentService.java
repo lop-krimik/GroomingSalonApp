@@ -37,7 +37,12 @@ public class AppointmentService {
         Handling handling = handlingRepository.findById(appointmentDto.getHandlingId())
                 .orElseThrow(() -> new RuntimeException("Service not found"));
 
-        if (appointmentRepository.existsByEmployeeAndDateTime(employee, appointmentDto.getDateTime())) {
+        HandlingName handlingName = handling.getHandlingName();
+
+        if (appointmentRepository.existsByEmployeeAndDateTimeLessThanAndEndDateTimeGreaterThan(employee,
+                appointmentDto.getDateTime().plus(Handling.getDurationHandling().get(handlingName)),
+                appointmentDto.getDateTime()
+                )) {
             throw new RuntimeException("This time slot is already booked");
         }
 
@@ -47,11 +52,12 @@ public class AppointmentService {
                 .pet(pet)
                 .handling(handling)
                 .dateTime(appointmentDto.getDateTime())
+                .endDateTime(appointmentDto.getDateTime().plus(Handling.getDurationHandling().get(handlingName)))
                 .build();
         return appointmentRepository.save(appointment);
     }
 
-    public AppointmentDto updateAppointment(Long appoinmentId, LocalDateTime date) {
+    public AppointmentDto updateAppointment(Long appoinmentId, LocalDateTime date, HandlingName handlingName) {
 
 
         Appointment appointment = appointmentRepository.findById(appoinmentId).orElseThrow(() -> new RuntimeException("not found"));
@@ -63,6 +69,7 @@ public class AppointmentService {
                 .employeeId(appointment.getEmployee().getEmployeeId())
                 .petId(appointment.getPet().getPetId())
                 .dateTime(date)
+                .endDateTime(date.plus(Handling.getDurationHandling().get(handlingName)))
                 .build();
     }
 

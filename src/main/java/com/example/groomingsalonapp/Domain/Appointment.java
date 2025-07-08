@@ -39,4 +39,7 @@ public class Appointment {
         @Column(name = "date_time")
         private LocalDateTime dateTime;
 
+    @Column(name = "end_date_time")
+    private LocalDateTime endDateTime;
+
 }

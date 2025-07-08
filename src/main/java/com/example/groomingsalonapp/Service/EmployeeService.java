@@ -3,6 +3,8 @@ package com.example.groomingsalonapp.Service;
 import com.example.groomingsalonapp.DTO.EmployeeDto;
 import com.example.groomingsalonapp.Domain.Appointment;
 import com.example.groomingsalonapp.Domain.Employee;
+import com.example.groomingsalonapp.Domain.Handling;
+import com.example.groomingsalonapp.Domain.HandlingName;
 import com.example.groomingsalonapp.ExceptiionHandler.EmployeeException.EmployeeAlreadyExistsException;
 import com.example.groomingsalonapp.ExceptiionHandler.EmployeeException.EmployeeNotFoundException;
 import com.example.groomingsalonapp.Repository.AppointmentRepository;
@@ -15,6 +17,10 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.*;
+import java.util.stream.Collectors;
+
+//import static com.example.groomingsalonapp.Domain.Handling.durationHandling;
+import static com.example.groomingsalonapp.Domain.Handling.getDurationHandling;
 
 @Service
 @RequiredArgsConstructor
@@ -41,48 +47,57 @@ public class EmployeeService {
         return employee.getWorkDay().contains(workDay);
     }
 
-    public List<LocalTime> findFreeSlots(Long employeeId, LocalDate date) {
+    public List<LocalTime> findFreeSlots(Long employeeId, LocalDate date, HandlingName handlingName) {
+        Duration slotDuration = Handling.getDurationHandling().get(handlingName);
+        if (slotDuration == null) {
+            throw new IllegalArgumentException("Unknown handling: " + handlingName);
+        }
+
         Employee employee = employeeRepository.findById(employeeId)
                 .orElseThrow(() -> new EmployeeNotFoundException("Employee not found: " + employeeId));
 
-        LocalTime workStart = employee.getWorkStart();
-        LocalTime workEnd = employee.getWorkEnd();
+        LocalDateTime dayStart = date.atTime(employee.getWorkStart());
+        LocalDateTime dayEnd = date.atTime(employee.getWorkEnd());
 
-        LocalDateTime startOfDay = date.atStartOfDay();
-        LocalDateTime endOfDay = date.atTime(23, 59, 59);
         List<Appointment> appointments = appointmentRepository
-                .findByEmployee_EmployeeIdAndDateTimeBetween(employeeId, startOfDay, endOfDay);
+                .findByEmployee_EmployeeIdAndDateTimeBetween(employeeId, dayStart, dayEnd);
 
+        // Отсортируем по началу
         appointments.sort(Comparator.comparing(Appointment::getDateTime));
 
-        List<LocalTime> freeSlots = new ArrayList<>();
-        LocalTime currentTime = workStart;
-
+        // Преобразуем занятые интервалы в удобный список
+        List<LocalDateTime[]> busyIntervals = new ArrayList<>();
         for (Appointment appointment : appointments) {
-            LocalTime appointmentStart = appointment.getDateTime().toLocalTime();
-            long minutesBetween = Duration.between(currentTime, appointmentStart).toMinutes();
+            busyIntervals.add(new LocalDateTime[] { appointment.getDateTime(), appointment.getEndDateTime() });
+        }
 
-            if (minutesBetween >= 30) {
-                while (minutesBetween >= 30) {
-                    freeSlots.add(currentTime);
-                    currentTime = currentTime.plusMinutes(30);
-                    minutesBetween = Duration.between(currentTime, appointmentStart).toMinutes();
+        List<LocalTime> freeSlots = new ArrayList<>();
+        LocalDateTime slotStart = dayStart;
+
+        while (!slotStart.plus(slotDuration).isAfter(dayEnd)) {
+            LocalDateTime slotEnd = slotStart.plus(slotDuration);
+
+            boolean overlaps = false;
+            for (LocalDateTime[] busy : busyIntervals) {
+                LocalDateTime busyStart = busy[0];
+                LocalDateTime busyEnd = busy[1];
+
+                // Проверяем пересечение интервалов
+                if (slotStart.isBefore(busyEnd) && slotEnd.isAfter(busyStart)) {
+                    overlaps = true;
+                    break;
                 }
             }
 
-            currentTime = appointmentStart.plusMinutes(
-                    appointment.getHandling().getDuration().toMinutes()
-            );
-        }
-
-        if (Duration.between(currentTime, workEnd).toMinutes() >= 30) {
-            while (!currentTime.isAfter(workEnd.minusMinutes(30))) {
-                freeSlots.add(currentTime);
-                currentTime = currentTime.plusMinutes(30);
+            if (!overlaps) {
+                freeSlots.add(slotStart.toLocalTime());
             }
+
+            slotStart = slotStart.plusMinutes(5); // можно менять шаг сканирования (например 5 минут)
         }
 
         return freeSlots;
     }
+
 
 }

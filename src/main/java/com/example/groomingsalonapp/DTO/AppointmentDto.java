@@ -13,4 +13,5 @@ public class AppointmentDto {
     private Long petId;
     private Long handlingId;
     private LocalDateTime dateTime;
+    private LocalDateTime endDateTime;
 }

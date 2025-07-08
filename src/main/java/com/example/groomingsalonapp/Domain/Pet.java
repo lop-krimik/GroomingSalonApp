@@ -33,7 +33,9 @@ public class Pet {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "client_id")
-    @JsonBackReference
+    @JsonBackReference // no recursive json
     private Client client;
+
+
 
 }

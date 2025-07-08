@@ -15,9 +15,9 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
 
     List<Appointment> findByEmployee_EmployeeIdAndDateTimeBetween(Long employeeId, LocalDateTime startOfDay, LocalDateTime endOfDay);
 
-    boolean existsByEmployeeAndDateTime(Employee employee, LocalDateTime dateTime);
+    boolean existsByEmployeeAndDateTimeLessThanAndEndDateTimeGreaterThan(Employee employee, LocalDateTime dateTime, LocalDateTime endDateTime);
 
-    void deleteAppointmentByDateTimeBefore(LocalDateTime localDateTime);
+    void deleteAppointmentByEndDateTimeBefore(LocalDateTime localDateTime);
 
     List<Appointment> findByClient_ClientId(Long clientId);
 

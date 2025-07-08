@@ -18,10 +18,10 @@ public class AppointmentSchedule {
 
     private final AppointmentRepository appointmentRepository;
 
-    @Scheduled(fixedRate = 5000)
+    @Scheduled(fixedRate = 60_000)
     @Transactional
     public void deleteAppointment(){
        LocalDateTime now = LocalDateTime.now();
-        appointmentRepository.deleteAppointmentByDateTimeBefore(now);
+        appointmentRepository.deleteAppointmentByEndDateTimeBefore(now);
         };
     }
