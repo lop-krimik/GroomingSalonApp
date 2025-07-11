@@ -4,6 +4,7 @@ import com.example.groomingsalonapp.DTO.PetDto;
 import com.example.groomingsalonapp.Domain.Client;
 import com.example.groomingsalonapp.Domain.Pet;
 import com.example.groomingsalonapp.ExceptiionHandler.ClientException.ClientNotFoundException;
+import com.example.groomingsalonapp.ExceptiionHandler.PetException.PetNotFoundException;
 import com.example.groomingsalonapp.Repository.ClientRepository;
 import com.example.groomingsalonapp.Repository.PetRepository;
 import lombok.RequiredArgsConstructor;
@@ -24,5 +25,23 @@ public class PetService {
         return PetDto.fromPetEntity(pet);
     }
 
+    public PetDto updatePet(Long petId, Pet pet, Long clientId) {
+        Client client = clientRepository.findById(clientId)
+                .orElseThrow(() -> new ClientNotFoundException("Client with id" + clientId + " was not found"));
+
+        Pet existingPet = petRepository.findById(petId)
+                .orElseThrow(() -> new PetNotFoundException("Pet with id " + petId + " was not found"));
+
+        existingPet.setPetName(pet.getPetName());
+        existingPet.setBreed(pet.getBreed());
+        existingPet.setWeight(pet.getWeight());
+        existingPet.setDescription(pet.getDescription());
+        existingPet.setAge(pet.getAge());
+        existingPet.setClient(client);
+
+        Pet updatedPet = petRepository.save(existingPet);
+
+        return PetDto.fromPetEntity(updatedPet);
+    }
 
 }

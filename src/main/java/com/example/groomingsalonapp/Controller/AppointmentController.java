@@ -25,9 +25,8 @@ public class AppointmentController {
 
     @PatchMapping("/updateDate/{appointmentId}")
     public AppointmentDto updateAppointment (@PathVariable Long appointmentId,
-                                             @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm") LocalDateTime date,
-                                             @PathVariable HandlingName handlingName
+                                             @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm") LocalDateTime date
     ){
-        return appointmentService.updateAppointment(appointmentId, date, handlingName);
+        return appointmentService.updateAppointment(appointmentId, date);
     }
 }

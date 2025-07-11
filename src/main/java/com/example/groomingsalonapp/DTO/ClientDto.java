@@ -10,6 +10,7 @@ import java.util.List;
 
 public record ClientDto(String clientName,
                         String phone,
+                        String email,
                         List<PetDto> pets
 ) {
     public static ClientDto fromClientEntity(Client client){
@@ -17,6 +18,7 @@ public record ClientDto(String clientName,
         return new ClientDto(
                     client.getClientName(),
                     client.getPhone(),
+                    client.getEmail(),
                     client.getPets().stream()
                             .map(PetDto::fromPetEntity)
                             .toList()

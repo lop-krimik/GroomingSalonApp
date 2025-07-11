@@ -57,11 +57,12 @@ public class AppointmentService {
         return appointmentRepository.save(appointment);
     }
 
-    public AppointmentDto updateAppointment(Long appoinmentId, LocalDateTime date, HandlingName handlingName) {
+    public AppointmentDto updateAppointment(Long appoinmentId, LocalDateTime date) {
 
 
         Appointment appointment = appointmentRepository.findById(appoinmentId).orElseThrow(() -> new RuntimeException("not found"));
         appointment.setDateTime(date);
+        appointment.setEndDateTime(date.plus(appointment.getHandling().getDuration()));
         appointmentRepository.save(appointment);
         return  AppointmentDto.builder()
                 .clientId(appointment.getClient().getClientId())
@@ -69,7 +70,8 @@ public class AppointmentService {
                 .employeeId(appointment.getEmployee().getEmployeeId())
                 .petId(appointment.getPet().getPetId())
                 .dateTime(date)
-                .endDateTime(date.plus(Handling.getDurationHandling().get(handlingName)))
+                .endDateTime(date.plus(appointment.getHandling().getDuration()))
+                .endDateTime(date.plus(appointment.getHandling().getDuration()))
                 .build();
     }
 

@@ -19,4 +19,19 @@ public class ClientCrontroller {
     public ClientDto createClient(@RequestBody Client client){
         return clientService.createClient(client);
     }
+
+    @GetMapping("/getClientByPhone")
+    public ClientDto findClientByPhone (@RequestParam String phone){
+        return clientService.findClientByPhone(phone);
+    }
+
+    @DeleteMapping("/deleteClient/{clientId}")
+    public void deleteClient (@PathVariable Long clientId){
+        clientService.deleteClient(clientId);
+    }
+
+    @PatchMapping("/updateClient/{clientId}")
+    public ClientDto updateClient (@RequestBody Client client, @PathVariable Long clientId){
+        return  clientService.updateClient(client, clientId);
+    }
 }

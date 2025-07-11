@@ -22,4 +22,5 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
     List<Appointment> findByClient_ClientId(Long clientId);
 
     List<Appointment> findByDateTimeBetween(LocalDateTime start, LocalDateTime end);
+
 }

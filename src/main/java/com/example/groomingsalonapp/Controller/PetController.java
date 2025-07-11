@@ -17,4 +17,9 @@ public class PetController {
     public PetDto createPet(@PathVariable Long clientId, @RequestBody Pet pet){
        return petService.createPetWithClient(pet, clientId);
     }
+
+    @PatchMapping("/updatePet/{clientId}")
+    public PetDto updatePet(@PathVariable Long clientId, @RequestBody Pet pet, @RequestParam Long petId){
+        return petService.updatePet(petId, pet, clientId);
+    }
 }

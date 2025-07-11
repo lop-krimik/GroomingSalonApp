@@ -62,10 +62,8 @@ public class EmployeeService {
         List<Appointment> appointments = appointmentRepository
                 .findByEmployee_EmployeeIdAndDateTimeBetween(employeeId, dayStart, dayEnd);
 
-        // Отсортируем по началу
         appointments.sort(Comparator.comparing(Appointment::getDateTime));
 
-        // Преобразуем занятые интервалы в удобный список
         List<LocalDateTime[]> busyIntervals = new ArrayList<>();
         for (Appointment appointment : appointments) {
             busyIntervals.add(new LocalDateTime[] { appointment.getDateTime(), appointment.getEndDateTime() });
@@ -93,7 +91,7 @@ public class EmployeeService {
                 freeSlots.add(slotStart.toLocalTime());
             }
 
-            slotStart = slotStart.plusMinutes(5); // можно менять шаг сканирования (например 5 минут)
+            slotStart = slotStart.plusMinutes(5);
         }
 
         return freeSlots;

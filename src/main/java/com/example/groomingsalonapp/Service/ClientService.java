@@ -1,6 +1,7 @@
 package com.example.groomingsalonapp.Service;
 
 import com.example.groomingsalonapp.DTO.ClientDto;
+import com.example.groomingsalonapp.Domain.Appointment;
 import com.example.groomingsalonapp.Domain.Client;
 import com.example.groomingsalonapp.Domain.Pet;
 import com.example.groomingsalonapp.ExceptiionHandler.ClientException.ClientAlreadyExistsException;
@@ -8,6 +9,7 @@ import com.example.groomingsalonapp.ExceptiionHandler.ClientException.ClientNotF
 import com.example.groomingsalonapp.Repository.AppointmentRepository;
 import com.example.groomingsalonapp.Repository.ClientRepository;
 import com.example.groomingsalonapp.Repository.PetRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -33,6 +35,30 @@ public class ClientService {
     {
         return ClientDto.fromClientEntity(clientRepository.findClientByPhone(phone)
                 .orElseThrow(()-> new ClientNotFoundException("Client with phone " + phone + " was not found")));
+    }
+
+    @Transactional
+    public void deleteClient(Long clientId) {
+        Client client = clientRepository.findById(clientId)
+                .orElseThrow(()-> new ClientNotFoundException("Client with id " + clientId + " was not found"));
+        List<Appointment> appointments = appointmentRepository.findByClient_ClientId(clientId);
+        appointmentRepository.deleteAll(appointments);
+        clientRepository.delete(client);
+    }
+
+    public ClientDto updateClient(Client newClient, Long clientId){
+        Client existingClient = clientRepository.findById(clientId)
+                .orElseThrow(
+                        ()-> new ClientNotFoundException("Client with id " + clientId + " was not found")
+                );
+
+        existingClient.setClientName(newClient.getClientName());
+        existingClient.setPhone(newClient.getPhone());
+        existingClient.setEmail(newClient.getEmail());
+
+        Client updateClient = clientRepository.save(existingClient);
+        return ClientDto.fromClientEntity(updateClient);
+
     }
 
 }
