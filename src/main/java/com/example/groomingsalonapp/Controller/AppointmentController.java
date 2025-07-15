@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -28,5 +29,14 @@ public class AppointmentController {
                                              @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm") LocalDateTime date
     ){
         return appointmentService.updateAppointment(appointmentId, date);
+    }
+    @GetMapping("/getAll")
+    public List<Appointment> getAllAppointment(){
+       return appointmentService.getAllAppointment();
+    }
+
+    @GetMapping("/getAppointment/{appointmentId}")
+    public AppointmentDto getAppointment(@PathVariable Long appointmentId){
+        return appointmentService.getAppointment(appointmentId);
     }
 }

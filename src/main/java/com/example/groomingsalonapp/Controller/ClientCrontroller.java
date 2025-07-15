@@ -1,6 +1,7 @@
 package com.example.groomingsalonapp.Controller;
 
 import com.example.groomingsalonapp.DTO.ClientDto;
+import com.example.groomingsalonapp.Domain.Appointment;
 import com.example.groomingsalonapp.Domain.Client;
 import com.example.groomingsalonapp.Domain.Pet;
 import com.example.groomingsalonapp.Service.ClientService;
@@ -33,5 +34,15 @@ public class ClientCrontroller {
     @PatchMapping("/updateClient/{clientId}")
     public ClientDto updateClient (@RequestBody Client client, @PathVariable Long clientId){
         return  clientService.updateClient(client, clientId);
+    }
+
+    @GetMapping("/getAll")
+    public List<Client> getAllAppointment(){
+        return clientService.getAllClient();
+    }
+
+    @GetMapping("/getClient/{clientId}")
+    public ClientDto getClient(@PathVariable Long clientId){
+        return  clientService.getClient(clientId);
     }
 }

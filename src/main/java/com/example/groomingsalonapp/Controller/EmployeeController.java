@@ -1,6 +1,7 @@
 package com.example.groomingsalonapp.Controller;
 
 import com.example.groomingsalonapp.DTO.EmployeeDto;
+import com.example.groomingsalonapp.Domain.Appointment;
 import com.example.groomingsalonapp.Domain.Employee;
 import com.example.groomingsalonapp.Domain.HandlingName;
 import com.example.groomingsalonapp.Service.EmployeeService;
@@ -31,5 +32,19 @@ public class EmployeeController {
             date = LocalDate.now();
         }
        return employeeService.findFreeSlots(employeeId, date, handlingName);
+    }
+
+    @GetMapping("/getAll")
+    public List<Employee> getAllEmployee(){
+        return employeeService.getAllEmployee();
+    }
+
+    @GetMapping("/getEmployee/{employeeId}")
+    public EmployeeDto getEmployee(@PathVariable Long employeeId){
+        return employeeService.getEmployee(employeeId);
+    }
+    @DeleteMapping("/deleteEmployee/{employeeId}")
+    public void deleteEmployee(@PathVariable Long employeeId){
+        employeeService.deleteEmployee(employeeId);
     }
 }

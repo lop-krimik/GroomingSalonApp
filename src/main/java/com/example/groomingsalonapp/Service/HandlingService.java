@@ -1,14 +1,18 @@
 package com.example.groomingsalonapp.Service;
 
 import com.example.groomingsalonapp.DTO.HandlingDto;
+import com.example.groomingsalonapp.Domain.Client;
 import com.example.groomingsalonapp.Domain.Handling;
 import com.example.groomingsalonapp.Domain.HandlingName;
+import com.example.groomingsalonapp.ExceptiionHandler.HandlingException.HandlingNotFoundException;
 import com.example.groomingsalonapp.Repository.AppointmentRepository;
 import com.example.groomingsalonapp.Repository.HandlingRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -46,5 +50,20 @@ public class HandlingService {
         handlingRepository.save(handling);
         return HandlingDto.fromEntityHandling(handling);
     }
+    public List<Handling> getAllHandling(){
+        return handlingRepository.findAll();
+    }
 
+    public HandlingDto getHandling(Long handlingId){
+        Handling handling = handlingRepository.findById(handlingId)
+                .orElseThrow(()-> new HandlingNotFoundException(handlingId));
+        return HandlingDto.fromEntityHandling(handling);
+    }
+
+    @Transactional
+    public void deleteHandling(Long handlingId){
+        Handling handling = handlingRepository.findById(handlingId)
+                .orElseThrow(()-> new HandlingNotFoundException(handlingId));
+        handlingRepository.delete(handling);
+    }
 }

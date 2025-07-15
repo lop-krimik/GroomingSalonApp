@@ -19,7 +19,7 @@ public class PetService {
 
     public PetDto createPetWithClient(Pet pet, Long clientId){
       Client client = clientRepository.findById(clientId)
-              .orElseThrow(()-> new ClientNotFoundException(String.format("Client with id: %d was not found", clientId)));
+              .orElseThrow(()-> new ClientNotFoundException(clientId));
         pet.setClient(client);
         petRepository.save(pet);
         return PetDto.fromPetEntity(pet);
@@ -27,7 +27,7 @@ public class PetService {
 
     public PetDto updatePet(Long petId, Pet pet, Long clientId) {
         Client client = clientRepository.findById(clientId)
-                .orElseThrow(() -> new ClientNotFoundException("Client with id" + clientId + " was not found"));
+                .orElseThrow(() -> new ClientNotFoundException(clientId));
 
         Pet existingPet = petRepository.findById(petId)
                 .orElseThrow(() -> new PetNotFoundException("Pet with id " + petId + " was not found"));
@@ -43,5 +43,6 @@ public class PetService {
 
         return PetDto.fromPetEntity(updatedPet);
     }
+
 
 }

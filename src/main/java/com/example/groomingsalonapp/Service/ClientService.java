@@ -34,13 +34,13 @@ public class ClientService {
     public ClientDto findClientByPhone (String phone)
     {
         return ClientDto.fromClientEntity(clientRepository.findClientByPhone(phone)
-                .orElseThrow(()-> new ClientNotFoundException("Client with phone " + phone + " was not found")));
+                .orElseThrow(()-> new ClientNotFoundException(phone)));
     }
 
     @Transactional
     public void deleteClient(Long clientId) {
         Client client = clientRepository.findById(clientId)
-                .orElseThrow(()-> new ClientNotFoundException("Client with id " + clientId + " was not found"));
+                .orElseThrow(()-> new ClientNotFoundException(clientId));
         List<Appointment> appointments = appointmentRepository.findByClient_ClientId(clientId);
         appointmentRepository.deleteAll(appointments);
         clientRepository.delete(client);
@@ -49,7 +49,7 @@ public class ClientService {
     public ClientDto updateClient(Client newClient, Long clientId){
         Client existingClient = clientRepository.findById(clientId)
                 .orElseThrow(
-                        ()-> new ClientNotFoundException("Client with id " + clientId + " was not found")
+                        ()-> new ClientNotFoundException(clientId)
                 );
 
         existingClient.setClientName(newClient.getClientName());
@@ -59,6 +59,13 @@ public class ClientService {
         Client updateClient = clientRepository.save(existingClient);
         return ClientDto.fromClientEntity(updateClient);
 
+    }
+    public List<Client> getAllClient(){
+        return clientRepository.findAll();
+    }
+    public ClientDto getClient(Long clientId){
+        Client client = clientRepository.findById(clientId).orElseThrow(()-> new ClientNotFoundException(clientId));
+        return ClientDto.fromClientEntity(client);
     }
 
 }

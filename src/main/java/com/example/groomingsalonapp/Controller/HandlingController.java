@@ -1,10 +1,13 @@
 package com.example.groomingsalonapp.Controller;
 
 import com.example.groomingsalonapp.DTO.HandlingDto;
+import com.example.groomingsalonapp.Domain.Appointment;
 import com.example.groomingsalonapp.Domain.Handling;
 import com.example.groomingsalonapp.Service.HandlingService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -23,5 +26,18 @@ public class HandlingController {
             return handlingService.getTotalPrice(clientId);
         }
 
+    @GetMapping("/getAll")
+    public List<Handling> getAllHandling(){
+        return handlingService.getAllHandling();
+    }
 
+    @GetMapping("/getHandling/{handlingId}")
+    public HandlingDto getHandling(@PathVariable Long handlingId){
+        return  handlingService.getHandling(handlingId);
+    }
+
+    @DeleteMapping("/deleteHandling/{handlingId}")
+    public void deleteHandling (@PathVariable Long handlingId){
+        handlingService.deleteHandling(handlingId);
+    }
 }

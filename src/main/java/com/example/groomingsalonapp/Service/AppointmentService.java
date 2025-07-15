@@ -2,6 +2,7 @@ package com.example.groomingsalonapp.Service;
 
 import com.example.groomingsalonapp.DTO.AppointmentDto;
 import com.example.groomingsalonapp.Domain.*;
+import com.example.groomingsalonapp.ExceptiionHandler.AppointmentException.AppointmentNotFoundException;
 import com.example.groomingsalonapp.ExceptiionHandler.ClientException.ClientNotFoundException;
 import com.example.groomingsalonapp.ExceptiionHandler.EmployeeException.EmployeeNotFoundException;
 import com.example.groomingsalonapp.Repository.*;
@@ -9,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -26,10 +28,10 @@ public class AppointmentService {
     public Appointment createAppointment(AppointmentDto appointmentDto) {
 
         Employee employee = employeeRepository.findById(appointmentDto.getEmployeeId())
-                .orElseThrow(() -> new EmployeeNotFoundException("Employee not found"));
+                .orElseThrow(() -> new EmployeeNotFoundException(appointmentDto.getEmployeeId()));
 
         Client client = clientRepository.findById(appointmentDto.getClientId())
-                .orElseThrow(() -> new ClientNotFoundException("Client not found"));
+                .orElseThrow(() -> new ClientNotFoundException(appointmentDto.getClientId()));
 
         Pet pet = petRepository.findById(appointmentDto.getPetId())
                 .orElseThrow(() -> new RuntimeException("Pet not found or doesn't belong to client"));
@@ -71,13 +73,29 @@ public class AppointmentService {
                 .petId(appointment.getPet().getPetId())
                 .dateTime(date)
                 .endDateTime(date.plus(appointment.getHandling().getDuration()))
-                .endDateTime(date.plus(appointment.getHandling().getDuration()))
                 .build();
     }
 
     public Integer countAppointment(Long clientId){
        int count = (int) appointmentRepository.findByClient_ClientId(clientId).stream().count();
        return count;
+    }
+
+    public List<Appointment> getAllAppointment(){
+        return appointmentRepository.findAll();
+    }
+
+    public AppointmentDto getAppointment(Long appoinmentId){
+        Appointment appointment = appointmentRepository.findById(appoinmentId)
+                .orElseThrow(()-> new AppointmentNotFoundException(appoinmentId));
+        return AppointmentDto.builder()
+                .endDateTime(appointment.getEndDateTime())
+                .handlingId(appointment.getHandling().getHandlingId())
+                .dateTime(appointment.getDateTime())
+                .petId(appointment.getPet().getPetId())
+                .employeeId(appointment.getEmployee().getEmployeeId())
+                .clientId(appointment.getClient().getClientId())
+                .build();
     }
 
 }

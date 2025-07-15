@@ -1,14 +1,12 @@
 package com.example.groomingsalonapp.Service;
 
 import com.example.groomingsalonapp.DTO.EmployeeDto;
-import com.example.groomingsalonapp.Domain.Appointment;
-import com.example.groomingsalonapp.Domain.Employee;
-import com.example.groomingsalonapp.Domain.Handling;
-import com.example.groomingsalonapp.Domain.HandlingName;
+import com.example.groomingsalonapp.Domain.*;
 import com.example.groomingsalonapp.ExceptiionHandler.EmployeeException.EmployeeAlreadyExistsException;
 import com.example.groomingsalonapp.ExceptiionHandler.EmployeeException.EmployeeNotFoundException;
 import com.example.groomingsalonapp.Repository.AppointmentRepository;
 import com.example.groomingsalonapp.Repository.EmployeeRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -42,7 +40,7 @@ public class EmployeeService {
 
     public Boolean isEmployeeWorking(Long employeeId, String workDay) {
         Employee employee = employeeRepository.findByEmployeeId(employeeId)
-                .orElseThrow(() -> new EmployeeNotFoundException("Employee not found, id: " + employeeId));
+                .orElseThrow(() -> new EmployeeNotFoundException(employeeId));
 
         return employee.getWorkDay().contains(workDay);
     }
@@ -54,7 +52,7 @@ public class EmployeeService {
         }
 
         Employee employee = employeeRepository.findById(employeeId)
-                .orElseThrow(() -> new EmployeeNotFoundException("Employee not found: " + employeeId));
+                .orElseThrow(() -> new EmployeeNotFoundException(employeeId));
 
         LocalDateTime dayStart = date.atTime(employee.getWorkStart());
         LocalDateTime dayEnd = date.atTime(employee.getWorkEnd());
@@ -97,5 +95,19 @@ public class EmployeeService {
         return freeSlots;
     }
 
+    public List<Employee> getAllEmployee(){
+        return employeeRepository.findAll();
+    }
+    @Transactional
+    public void deleteEmployee(Long employeeId){
+        Employee employee = employeeRepository.findById(employeeId)
+                .orElseThrow(()-> new EmployeeNotFoundException(employeeId));
+    }
+
+    public EmployeeDto getEmployee(Long employeeId){
+        Employee employee = employeeRepository.findById(employeeId)
+                .orElseThrow(()-> new EmployeeNotFoundException(employeeId));
+        return EmployeeDto.fromEmployeeEntity(employee);
+    }
 
 }
